@@ -26,7 +26,7 @@ var commands = []*discordgo.ApplicationCommand{
 			{
 				Type:        discordgo.ApplicationCommandOptionNumber,
 				Name:        "value",
-				Description: "確率 (%) を入力 (0.1〜100.0)",
+				Description: "確率(%)を入力 (0.1〜100.0)",
 				Required:    true,
 				MinValue:    floatPtr(0.1),
 				MaxValue:    100.0,
@@ -134,7 +134,7 @@ func handleNowSetting(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	}
 
 	msg := fmt.Sprintf(
-		"📊 **現在の設定**\n検知: %s\n冷笑確率: **%.1f%%**",
+		"⚙️ **現在の設定**\n検知: %s\n冷笑確率: **%.1f%%**",
 		status,
 		setting.Prob,
 	)
