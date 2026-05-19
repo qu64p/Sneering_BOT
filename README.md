@@ -1,2 +1,2 @@
-# -BOT
-Sneering BOT
+# 冷笑BOT
+任意のメッセージ(Botのものを除く)に対して冷笑するBotです。
