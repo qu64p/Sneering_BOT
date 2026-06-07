@@ -11,14 +11,12 @@ import (
 
 var DB *sql.DB
 
-// GuildSetting はサーバーごとの設定を表す
 type GuildSetting struct {
 	GuildID  string
 	Enabled  bool
-	Prob     float64 // 確率 (%)
+	Prob     float64
 }
 
-// Init はデータベース接続を初期化し、テーブルを作成する
 func Init() error {
 	dsn := os.Getenv("SUPABASE_DB_URL")
 	if dsn == "" {
@@ -43,7 +41,6 @@ func Init() error {
 	return nil
 }
 
-// migrate はテーブルが存在しない場合に作成する
 func migrate() error {
 	query := `
 	CREATE TABLE IF NOT EXISTS guild_settings (
@@ -55,7 +52,6 @@ func migrate() error {
 	return err
 }
 
-// GetSetting はサーバーの設定を取得する。存在しない場合はデフォルト設定を返す。
 func GetSetting(guildID string) (*GuildSetting, error) {
 	row := DB.QueryRow(
 		`SELECT guild_id, enabled, prob FROM guild_settings WHERE guild_id = $1`,
@@ -65,7 +61,7 @@ func GetSetting(guildID string) (*GuildSetting, error) {
 	s := &GuildSetting{}
 	err := row.Scan(&s.GuildID, &s.Enabled, &s.Prob)
 	if err == sql.ErrNoRows {
-		// 初回アクセス時にデフォルト設定を挿入
+		
 		s = &GuildSetting{GuildID: guildID, Enabled: true, Prob: 10.0}
 		if err := upsertSetting(s); err != nil {
 			return nil, err
@@ -78,7 +74,6 @@ func GetSetting(guildID string) (*GuildSetting, error) {
 	return s, nil
 }
 
-// upsertSetting は設定を挿入または更新する
 func upsertSetting(s *GuildSetting) error {
 	_, err := DB.Exec(`
 		INSERT INTO guild_settings (guild_id, enabled, prob)
@@ -93,7 +88,6 @@ func upsertSetting(s *GuildSetting) error {
 	return nil
 }
 
-// SetEnabled は検知ON/OFFを切り替える
 func SetEnabled(guildID string, enabled bool) error {
 	s, err := GetSetting(guildID)
 	if err != nil {
@@ -103,7 +97,6 @@ func SetEnabled(guildID string, enabled bool) error {
 	return upsertSetting(s)
 }
 
-// SetProb は確率を更新する
 func SetProb(guildID string, prob float64) error {
 	s, err := GetSetting(guildID)
 	if err != nil {
@@ -111,4 +104,20 @@ func SetProb(guildID string, prob float64) error {
 	}
 	s.Prob = prob
 	return upsertSetting(s)
+}
+
+func DeleteSetting(guildID string) error {
+	_, err := DB.Exec(`DELETE FROM guild_settings WHERE guild_id = $1`, guildID)
+	if err != nil {
+		return fmt.Errorf("設定削除失敗: %w", err)
+	}
+	return nil
+}
+
+func DeleteSetting(guildID string) error {
+	_, err := DB.Exec(`DELETE FROM guild_settings WHERE guild_id = $1`, guildID)
+	if err != nil {
+		return fmt.Errorf("設定削除失敗: %w", err)
+	}
+	return nil
 }
