@@ -21,7 +21,7 @@ func New() *Handler {
 var commands = []*discordgo.ApplicationCommand{
 	{
 		Name:        "prob",
-		Description: "冷笑が発生する確率を設定します (0.1〜100.0 %)",
+		Description: "冷笑が発生する確率を設定 (0.1〜100.0 %)",
 		Options: []*discordgo.ApplicationCommandOption{
 			{
 				Type:        discordgo.ApplicationCommandOptionNumber,
@@ -35,11 +35,11 @@ var commands = []*discordgo.ApplicationCommand{
 	},
 	{
 		Name:        "switch",
-		Description: "冷笑の検知をON/OFFで切り替えます",
+		Description: "冷笑の検知をON/OFFで切り替え",
 	},
 	{
 		Name:        "nowsetting",
-		Description: "現在の設定（ON/OFF・確率）を確認します",
+		Description: "現在の設定（ON/OFF・確率）を確認",
 	},
 }
 
@@ -68,7 +68,7 @@ func (h *Handler) OnInteraction(s *discordgo.Session, i *discordgo.InteractionCr
 
 	// DM からの実行を防ぐ
 	if i.GuildID == "" {
-		respond(s, i, "このコマンドはサーバー内でのみ使用できます。")
+		respond(s, i, "このコマンドはサーバー内でのみ使用可能です。")
 		return
 	}
 
@@ -88,7 +88,7 @@ func handleProb(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	prob := options[0].FloatValue()
 
 	if err := db.SetProb(i.GuildID, prob); err != nil {
-		log.Printf("確率設定エラー: %v", err)
+		log.Printf("［エラー］: %v", err)
 		respond(s, i, "❌ 確率の設定に失敗しました。")
 		return
 	}
@@ -100,14 +100,14 @@ func handleProb(s *discordgo.Session, i *discordgo.InteractionCreate) {
 func handleSwitch(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	setting, err := db.GetSetting(i.GuildID)
 	if err != nil {
-		log.Printf("設定取得エラー: %v", err)
+		log.Printf("［エラー］: %v", err)
 		respond(s, i, "❌ 設定の取得に失敗しました。")
 		return
 	}
 
 	newEnabled := !setting.Enabled
 	if err := db.SetEnabled(i.GuildID, newEnabled); err != nil {
-		log.Printf("ON/OFF切替エラー: %v", err)
+		log.Printf("［エラー］: %v", err)
 		respond(s, i, "❌ 設定の切り替えに失敗しました。")
 		return
 	}
@@ -123,7 +123,7 @@ func handleSwitch(s *discordgo.Session, i *discordgo.InteractionCreate) {
 func handleNowSetting(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	setting, err := db.GetSetting(i.GuildID)
 	if err != nil {
-		log.Printf("設定取得エラー: %v", err)
+		log.Printf("［エラー］: %v", err)
 		respond(s, i, "❌ 設定の取得に失敗しました。")
 		return
 	}
@@ -141,7 +141,6 @@ func handleNowSetting(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	respond(s, i, msg)
 }
 
-// respond はエフェメラル（自分にだけ見える）なレスポンスを返す
 func respond(s *discordgo.Session, i *discordgo.InteractionCreate, content string) {
 	err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
@@ -153,4 +152,12 @@ func respond(s *discordgo.Session, i *discordgo.InteractionCreate, content strin
 	if err != nil {
 		log.Printf("レスポンス送信エラー: %v", err)
 	}
+}
+
+func (h *Handler) OnGuildDelete(s *discordgo.Session, g *discordgo.GuildDelete) {
+	if err := db.DeleteSetting(g.ID); err != nil {
+		log.Printf("設定削除エラー (guild: %s): %v", g.ID, err)
+		return
+	}
+	log.Printf("サーバー離脱を検知。設定を削除しました (guild: %s)", g.ID)
 }
