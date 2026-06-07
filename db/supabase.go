@@ -114,10 +114,3 @@ func DeleteSetting(guildID string) error {
 	return nil
 }
 
-func DeleteSetting(guildID string) error {
-	_, err := DB.Exec(`DELETE FROM guild_settings WHERE guild_id = $1`, guildID)
-	if err != nil {
-		return fmt.Errorf("設定削除失敗: %w", err)
-	}
-	return nil
-}
