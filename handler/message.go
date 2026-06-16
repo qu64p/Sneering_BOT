@@ -12,7 +12,7 @@ import (
 // cynicalReplies は冷笑リプライの一覧
 var cynicalReplies = []string{
 	"うおw😅",
-	"どわー笑😅",
+ "どわー笑😅",
 	"ったく…w😅",
 	"かっこよw😅",
 	"えぐー！笑😅",
@@ -40,7 +40,7 @@ var cynicalReplies = []string{
  "わかったわかったww😅",
  "あっ、そういう感じなん？笑😅",
  "ほーん…w😅",
- "ちょwえぐいってww😅"
+ "ちょwえぐいってww😅",
 }
 
 // OnMessage はメッセージイベントを処理する
