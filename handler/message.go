@@ -9,7 +9,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-// cynicalReplies は冷笑リプライの一覧
+
 var cynicalReplies = []string{
   "うおw😅",
   "どわー笑😅",
@@ -44,13 +44,14 @@ var cynicalReplies = []string{
 
 }
 
-// OnMessage はメッセージイベントを処理する
+
 func (h *Handler) OnMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
-	// Bot 自身のメッセージは無視
 	if m.Author.ID == s.State.User.ID || m.Author.Bot {
 		return
 	}
-	// DM は無視（GuildID が空）
+  if m.Type != discordgo.MessageTypeDefault && m.Type != discordgo.MessageTypeReply {
+    return
+  }
 	if m.GuildID == "" {
 		return
 	}
@@ -61,17 +62,17 @@ func (h *Handler) OnMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	// 検知がOFFなら何もしない
+
 	if !setting.Enabled {
 		return
 	}
 
-	// 確率判定 (0.0〜100.0 %)
+
 	if rand.Float64()*100 >= setting.Prob {
 		return
 	}
 
-	// ランダムにリプライを選択
+
 	reply := cynicalReplies[rand.Intn(len(cynicalReplies))]
 
 	_, err = s.ChannelMessageSendReply(
