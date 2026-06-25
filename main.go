@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -43,19 +42,6 @@ func main() {
 	defer dg.Close()
 
 	log.Println("Botが起動しました。Ctrl+Cで終了します。")
-
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
-	}
-	go func() {
-		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-			w.WriteHeader(http.StatusOK)
-		})
-		if err := http.ListenAndServe(":"+port, nil); err != nil {
-			log.Printf("HTTPサーバーエラー: %v", err)
-		}
-	}()
 
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM)
