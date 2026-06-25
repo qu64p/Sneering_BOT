@@ -62,16 +62,13 @@ func (h *Handler) OnMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-
 	if !setting.Enabled {
 		return
 	}
 
-
 	if rand.Float64()*100 >= setting.Prob {
 		return
 	}
-
 
 	reply := cynicalReplies[rand.Intn(len(cynicalReplies))]
 
