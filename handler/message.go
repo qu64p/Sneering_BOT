@@ -46,6 +46,14 @@ var cynicalReplies = []string{
 
 
 func (h *Handler) OnMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
+  defer func() {
+    if r := recover(); r != nil {
+        log.Printf("OnMessage panicを回復しました: %v", r)
+    }
+  }()
+  if m.Author == nil {
+    return
+  }
 	if m.Author.ID == s.State.User.ID || m.Author.Bot {
 		return
 	}
