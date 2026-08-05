@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -11,6 +12,27 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 )
+
+
+func startHealthServer() {
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("ok"))
+	})
+
+	go func() {
+		log.Printf("ヘルスチェックサーバー起動: :%s/health", port)
+		if err := http.ListenAndServe(":"+port, mux); err != nil {
+			log.Fatalf("ヘルスチェックサーバー起動失敗: %v", err)
+		}
+	}()
+}
 
 func main() {
 	token := os.Getenv("DISCORD_TOKEN")
@@ -41,7 +63,10 @@ func main() {
 	}
 	defer dg.Close()
 
-	log.Println("Botが起動しました。Ctrl+Cで終了します。")
+
+	startHealthServer()
+
+	log.Println("Botが起動しました。")
 
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM)
