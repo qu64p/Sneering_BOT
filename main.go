@@ -49,6 +49,8 @@ func main() {
 		log.Fatalf("Discordセッション作成失敗: %v", err)
 	}
 
+	dg.LogLevel = discordgo.LogError
+
 	dg.Identify.Intents = discordgo.IntentsGuildMessages | discordgo.IntentsGuilds
 
 	h := handler.New()
