@@ -86,6 +86,9 @@ func (h *Handler) OnMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
 		m.Reference(),
 	)
 	if err != nil {
+    if strings.Contains(err.Error(), "403") {
+			return
+		}
 		log.Printf("リプライ送信エラー: %v", err)
 	}
 }
