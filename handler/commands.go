@@ -68,7 +68,7 @@ func (h *Handler) OnInteraction(s *discordgo.Session, i *discordgo.InteractionCr
 
 	// DM からの実行を防ぐ
 	if i.GuildID == "" {
-		respond(s, i, "このコマンドはサーバー内でのみ使用可能です。")
+		respond(s, i, "このコマンドはサーバー内でのみ使用可能です")
 		return
 	}
 
@@ -89,11 +89,11 @@ func handleProb(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 	if err := db.SetProb(i.GuildID, prob); err != nil {
 		log.Printf("［エラー］: %v", err)
-		respond(s, i, "❌ 確率の設定に失敗しました。")
+		respond(s, i, "❌ 確率の設定に失敗しました")
 		return
 	}
 
-	respond(s, i, fmt.Sprintf("✅ 冷笑確率を **%.1f%%** に設定しました。", prob))
+	respond(s, i, fmt.Sprintf("✅ 冷笑確率を **%.1f%%** に設定しました", prob))
 }
 
 // handleSwitch はON/OFFを切り替える
@@ -101,14 +101,14 @@ func handleSwitch(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	setting, err := db.GetSetting(i.GuildID)
 	if err != nil {
 		log.Printf("［エラー］: %v", err)
-		respond(s, i, "❌ 設定の取得に失敗しました。")
+		respond(s, i, "❌ 設定の取得に失敗しました")
 		return
 	}
 
 	newEnabled := !setting.Enabled
 	if err := db.SetEnabled(i.GuildID, newEnabled); err != nil {
 		log.Printf("［エラー］: %v", err)
-		respond(s, i, "❌ 設定の切り替えに失敗しました。")
+		respond(s, i, "❌ 設定の切り替えに失敗しました")
 		return
 	}
 
@@ -116,7 +116,7 @@ func handleSwitch(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	if !newEnabled {
 		status = "🔴 OFF"
 	}
-	respond(s, i, fmt.Sprintf("✅ 冷笑検知を **%s** に切り替えました。", status))
+	respond(s, i, fmt.Sprintf("✅ 冷笑検知を **%s** に切り替えました", status))
 }
 
 // handleNowSetting は現在の設定を表示する
@@ -124,17 +124,17 @@ func handleNowSetting(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	setting, err := db.GetSetting(i.GuildID)
 	if err != nil {
 		log.Printf("［エラー］: %v", err)
-		respond(s, i, "❌ 設定の取得に失敗しました。")
+		respond(s, i, "❌ 設定の取得に失敗しました")
 		return
 	}
 
-	status := "🟢 ON"
+	status := "**🟢 ON**"
 	if !setting.Enabled {
-		status = "🔴 OFF"
+		status = "**🔴 OFF**"
 	}
 
 	msg := fmt.Sprintf(
-		"⚙️ **現在の設定**\n検知: %s\n冷笑確率: **%.1f%%**",
+		"**【⚙️ 現在の設定】**\n検知: %s\n冷笑確率: **%.1f%%**",
 		status,
 		setting.Prob,
 	)
